@@ -1,0 +1,15 @@
+com\CME\backend\repository\TradeInfoRepository.class
+com\CME\backend\repository\CombinedDataRepository.class
+com\CME\backend\config\DataSourceConfig.class
+com\CME\backend\repository\ClickhouseRepository.class
+com\CME\backend\repository\InstrumentRepository.class
+com\CME\backend\util\PerformanceMetrics.class
+com\CME\backend\BackendApplication.class
+com\CME\backend\model\StockData.class
+com\CME\backend\repository\StockDataRepository.class
+com\CME\backend\controller\TradingController.class
+com\CME\backend\model\Instrument.class
+com\CME\backend\model\TradeInfo.class
+com\CME\backend\util\CombinedStockDataDTORowMapper.class
+com\CME\backend\dto\CombinedStockDataDTO.class
+com\CME\backend\service\TradingService.class
