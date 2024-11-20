@@ -6,10 +6,12 @@ com\CME\backend\repository\InstrumentRepository.class
 com\CME\backend\util\PerformanceMetrics.class
 com\CME\backend\BackendApplication.class
 com\CME\backend\model\StockData.class
+com\CME\backend\repository\AggregateRepository.class
 com\CME\backend\repository\StockDataRepository.class
 com\CME\backend\controller\TradingController.class
 com\CME\backend\model\Instrument.class
 com\CME\backend\model\TradeInfo.class
 com\CME\backend\util\CombinedStockDataDTORowMapper.class
+com\CME\backend\dto\AggregateFunctionDTO.class
 com\CME\backend\dto\CombinedStockDataDTO.class
 com\CME\backend\service\TradingService.class
