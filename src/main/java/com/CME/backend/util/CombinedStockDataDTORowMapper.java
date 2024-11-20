@@ -25,7 +25,7 @@ public class CombinedStockDataDTORowMapper implements RowMapper<CombinedStockDat
                 dto.setFinalValue(rs.getBigDecimal("final_value"));
                 dto.setFinalQuantity(rs.getInt("final_quantity"));
                 dto.setValue(rs.getBigDecimal("value"));
-                dto.setFfmCap(rs.getBigDecimal("s_ffm_cap"));  // Add this line to set ffm_cap
+                dto.setFfmCap(rs.getBigDecimal("s_ffm_cap"));
                 dto.setWeek52High(rs.getBigDecimal("s_week_52_high"));
                 dto.setWeek52Low(rs.getBigDecimal("s_week_52_low"));
                 dto.setFinalPrice(rs.getBigDecimal("final_price"));
@@ -34,6 +34,7 @@ public class CombinedStockDataDTORowMapper implements RowMapper<CombinedStockDat
 
                 // Mapping TradeInfo fields
                 dto.setTradeId(rs.getString("trade_id"));
+                dto.setInstrumentId(rs.getString("t_instrumentId"));
                 dto.setTradedVolumeLakhs(rs.getBigDecimal("traded_volume_lakhs"));
                 dto.setTradedValueCr(rs.getBigDecimal("traded_value_cr"));
                 dto.setTotalMarketCapCr(rs.getBigDecimal("total_market_cap_cr"));
