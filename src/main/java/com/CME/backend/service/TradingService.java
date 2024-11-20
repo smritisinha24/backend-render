@@ -1,7 +1,8 @@
 package com.CME.backend.service;
 
-import com.CME.backend.dto.AggregateFunctionDTO;
+import com.CME.backend.dto.TradeAggregateDTO;
 import com.CME.backend.dto.CombinedStockDataDTO;
+import com.CME.backend.dto.IndustryAggregateDTO;
 import com.CME.backend.model.Instrument;
 import com.CME.backend.model.StockData;
 import com.CME.backend.model.TradeInfo;
@@ -85,8 +86,7 @@ public class TradingService {
 
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
             return clickhouseRepository.findInstrumentByInstrumentId(instrumentId);
-        }
-        else {
+        } else {
             return instrumentRepository.findByInstrumentIdIgnoreCase(instrumentId);
         }
     }
@@ -102,12 +102,24 @@ public class TradingService {
         }
     }
 
-    public List<AggregateFunctionDTO> getTradeStats(String dbsource, LocalDate startDate, LocalDate endDate) {
+    public List<TradeAggregateDTO> getTradeStats(String dbsource, LocalDate startDate, LocalDate endDate) {
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
-            return clickhouseRepository.getAggregateTradeStats(startDate, endDate);
+            return clickhouseRepository.getTradeAggregateStats(startDate, endDate);
         } else if ("postgres".equalsIgnoreCase(dbsource)) {
-            return aggregateRepository.getAggregateTradeStats(startDate, endDate);
+            return aggregateRepository.getTradeAggregateStats(startDate, endDate);
         } else {
             throw new IllegalArgumentException("Invalid dbsource. Use 'clickhouse' or 'postgres'.");
         }
-    }}
+    }
+
+    public List<IndustryAggregateDTO> getIndustryStats(String dbsource, LocalDate startDate, LocalDate endDate) {
+        if ("clickhouse".equalsIgnoreCase(dbsource)) {
+            return clickhouseRepository.getIndustryAggregateStats(startDate, endDate);
+        } else if ("postgres".equalsIgnoreCase(dbsource)) {
+            return aggregateRepository.getIndustryAggregateStats(startDate, endDate);
+        } else {
+            throw new IllegalArgumentException("Invalid dbsource. Use 'clickhouse' or 'postgres'.");
+        }
+
+    }
+}

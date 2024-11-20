@@ -1,5 +1,8 @@
 package com.CME.backend.util;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 public class PerformanceMetrics {
     private long startTime;
     private long endTime;
@@ -7,24 +10,39 @@ public class PerformanceMetrics {
     private long totalBytesProcessed;
 
     public void startSession() {
-        this.startTime = System.currentTimeMillis();
+        this.startTime = System.nanoTime();
         this.queryCount = 0;
         this.totalBytesProcessed = 0;
     }
 
     public void endQuery(long dataSizeInBytes) {
-        this.endTime = System.currentTimeMillis();
+        this.endTime = System.nanoTime();
         this.queryCount++;
-        this.totalBytesProcessed += dataSizeInBytes;
+        this.totalBytesProcessed += (dataSizeInBytes > 0) ? dataSizeInBytes : 1;
     }
 
-    public long getReadSpeed() {
-        return endTime - startTime;
+    public BigDecimal getElapsedTimeSeconds() {
+        long elapsedTimeInNanoSeconds = endTime - startTime;
+        return BigDecimal.valueOf(elapsedTimeInNanoSeconds)
+                .divide(BigDecimal.valueOf(1_000_000_000), 9, RoundingMode.HALF_UP);
     }
 
-    public double getThroughput() {
-        long elapsedTimeInMillis = endTime - startTime;
-        return (elapsedTimeInMillis > 0) ? (double) totalBytesProcessed / (elapsedTimeInMillis / 1000.0) : 0;
+    public BigDecimal getThroughput() {
+        BigDecimal elapsedTimeInSeconds = getElapsedTimeSeconds();
+        if (totalBytesProcessed == 0) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal throughput = BigDecimal.valueOf(totalBytesProcessed)
+                .divide(elapsedTimeInSeconds, 9, RoundingMode.HALF_UP);
+
+        if (throughput.compareTo(BigDecimal.valueOf(0.0001)) < 0) {
+            throughput = BigDecimal.ZERO;
+        }
+        return throughput;
+    }
+
+    public long getTotalBytesProcessed() {
+        return totalBytesProcessed;
     }
 
     public void resetMetrics() {

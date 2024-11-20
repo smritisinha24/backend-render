@@ -1,7 +1,8 @@
 package com.CME.backend.repository;
 
-import com.CME.backend.dto.AggregateFunctionDTO;
+import com.CME.backend.dto.TradeAggregateDTO;
 import com.CME.backend.dto.CombinedStockDataDTO;
+import com.CME.backend.dto.IndustryAggregateDTO;
 import com.CME.backend.model.Instrument;
 import com.CME.backend.model.StockData;
 import com.CME.backend.model.TradeInfo;
@@ -151,13 +152,14 @@ public class ClickhouseRepository {
         return jdbcTemplate.query(sql, new CombinedStockDataDTORowMapper(), symbol);
     }
 
-    public List<AggregateFunctionDTO> getAggregateTradeStats(LocalDate startDate, LocalDate endDate) {
+    public List<TradeAggregateDTO> getTradeAggregateStats(LocalDate startDate, LocalDate endDate) {
         String query = """
             SELECT
                 instrument_id,
                 trade_date,
                 AVG(traded_value_cr) AS avg_price,
                 SUM(traded_volume_lakhs) AS total_volume,
+                
                 MAX(traded_value_cr) AS max_price
             FROM
                 trade_info
@@ -167,10 +169,10 @@ public class ClickhouseRepository {
                 instrument_id, trade_date
             ORDER BY
                 trade_date ASC, instrument_id ASC
-            LIMIT 100000
+            LIMIT 100
         """;
 
-        return jdbcTemplate.query(query, (rs, rowNum) -> new AggregateFunctionDTO(
+        return jdbcTemplate.query(query, (rs, rowNum) -> new TradeAggregateDTO(
                 rs.getString("instrument_id"),
                 rs.getDate("trade_date").toLocalDate(),
                 rs.getBigDecimal("avg_price"),
@@ -178,4 +180,36 @@ public class ClickhouseRepository {
                 rs.getBigDecimal("max_price")
         ), startDate, endDate);
     }
+
+    // Aggregate function
+    public List<IndustryAggregateDTO> getIndustryAggregateStats(LocalDate startDate, LocalDate endDate) {
+        String query = """
+        SELECT
+            industry,
+            toStartOfMonth(trade_date) AS trade_month,
+            AVG(traded_value_cr) AS avg_traded_value,
+            SUM(traded_volume_lakhs) AS total_traded_volume,
+            MAX(traded_value_cr) AS max_traded_value
+        FROM
+            trade_info
+        INNER JOIN
+            instrument USING (instrument_id)
+        WHERE
+            trade_date BETWEEN ? AND ?
+        GROUP BY
+            industry, trade_month
+        ORDER BY
+            trade_month ASC, industry ASC
+        LIMIT 100
+    """;
+
+        return jdbcTemplate.query(query, (rs, rowNum) -> new IndustryAggregateDTO(
+                rs.getString("industry"),
+                rs.getDate("trade_month").toLocalDate(),
+                rs.getBigDecimal("avg_traded_value"),
+                rs.getBigDecimal("total_traded_volume"),
+                rs.getBigDecimal("max_traded_value")
+        ), startDate, endDate);
+    }
+
 }
