@@ -1,5 +1,6 @@
 package com.CME.backend.service;
 
+import com.CME.backend.dto.AggregateFunctionDTO;
 import com.CME.backend.dto.CombinedStockDataDTO;
 import com.CME.backend.model.Instrument;
 import com.CME.backend.model.StockData;
@@ -11,6 +12,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -33,6 +35,10 @@ public class TradingService {
 
     @Autowired
     private CombinedDataRepository combinedDataRepository;
+
+    @Autowired
+    private AggregateRepository aggregateRepository;
+
 
     private void validateDbSource(String dbsource) {
         if (!"clickhouse".equalsIgnoreCase(dbsource) && !"postgres".equalsIgnoreCase(dbsource)) {
@@ -78,10 +84,10 @@ public class TradingService {
         validateDbSource(dbsource);
 
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
-        return clickhouseRepository.findInstrumentByInstrumentId(instrumentId);
-    }
+            return clickhouseRepository.findInstrumentByInstrumentId(instrumentId);
+        }
         else {
-        return instrumentRepository.findByInstrumentIdIgnoreCase(instrumentId);
+            return instrumentRepository.findByInstrumentIdIgnoreCase(instrumentId);
         }
     }
 
@@ -96,4 +102,12 @@ public class TradingService {
         }
     }
 
-}
+    public List<AggregateFunctionDTO> getTradeStats(String dbsource, LocalDate startDate, LocalDate endDate) {
+        if ("clickhouse".equalsIgnoreCase(dbsource)) {
+            return clickhouseRepository.getAggregateTradeStats(startDate, endDate);
+        } else if ("postgres".equalsIgnoreCase(dbsource)) {
+            return aggregateRepository.getAggregateTradeStats(startDate, endDate);
+        } else {
+            throw new IllegalArgumentException("Invalid dbsource. Use 'clickhouse' or 'postgres'.");
+        }
+    }}

@@ -1,5 +1,6 @@
 package com.CME.backend.controller;
 
+import com.CME.backend.dto.AggregateFunctionDTO;
 import com.CME.backend.dto.CombinedStockDataDTO;
 import com.CME.backend.model.Instrument;
 import com.CME.backend.model.StockData;
@@ -8,9 +9,11 @@ import com.CME.backend.service.TradingService;
 import com.CME.backend.util.PerformanceMetrics;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +101,24 @@ public class TradingController {
 
         return ResponseEntity.ok(response);
     }
+
+    // Endpoint to test aggregate function
+    @GetMapping("/aggregate")
+    ResponseEntity<Map<String, Object>> getTradeStats(
+            @RequestParam("dbsource") String dbsource,
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        performanceMetrics.startSession();
+        List<AggregateFunctionDTO> aggregateData = tradingService.getTradeStats(dbsource, startDate, endDate);
+        long dataSize = calculateDataSize(aggregateData);
+        performanceMetrics.endQuery(dataSize);
+        Map<String, Object> response = new HashMap<>();
+        response.put("data", aggregateData);
+        response.put("performanceMetrics", getPerformanceMetrics());
+
+        return ResponseEntity.ok(response);
+    }
+
 
     // Method to calculate data size in bytes
     private long calculateDataSize(Object data) {

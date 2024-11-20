@@ -1,5 +1,6 @@
 package com.CME.backend.repository;
 
+import com.CME.backend.dto.AggregateFunctionDTO;
 import com.CME.backend.dto.CombinedStockDataDTO;
 import com.CME.backend.model.Instrument;
 import com.CME.backend.model.StockData;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -147,5 +149,33 @@ public class ClickhouseRepository {
                 """;
 
         return jdbcTemplate.query(sql, new CombinedStockDataDTORowMapper(), symbol);
+    }
+
+    public List<AggregateFunctionDTO> getAggregateTradeStats(LocalDate startDate, LocalDate endDate) {
+        String query = """
+            SELECT
+                instrument_id,
+                trade_date,
+                AVG(traded_value_cr) AS avg_price,
+                SUM(traded_volume_lakhs) AS total_volume,
+                MAX(traded_value_cr) AS max_price
+            FROM
+                trade_info
+            WHERE
+                trade_date BETWEEN ? AND ?
+            GROUP BY
+                instrument_id, trade_date
+            ORDER BY
+                trade_date ASC, instrument_id ASC
+            LIMIT 100000
+        """;
+
+        return jdbcTemplate.query(query, (rs, rowNum) -> new AggregateFunctionDTO(
+                rs.getString("instrument_id"),
+                rs.getDate("trade_date").toLocalDate(),
+                rs.getBigDecimal("avg_price"),
+                rs.getBigDecimal("total_volume"),
+                rs.getBigDecimal("max_price")
+        ), startDate, endDate);
     }
 }

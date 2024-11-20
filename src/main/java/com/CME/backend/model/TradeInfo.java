@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "trade_info")
@@ -41,6 +42,13 @@ public class TradeInfo {
 
     @Column(name = "face_value")
     private BigDecimal faceValue;
+
+    @Column(name = "trade_date")
+    private LocalDate tradeDate;
+
+    public LocalDate getTradeDate() { return tradeDate; }
+
+    public void setTradeDate(LocalDate tradeDate) { this.tradeDate = tradeDate; }
 
     public String getTradeId() {
         return tradeId;
