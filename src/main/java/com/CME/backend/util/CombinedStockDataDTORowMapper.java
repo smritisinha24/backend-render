@@ -34,7 +34,7 @@ public class CombinedStockDataDTORowMapper implements RowMapper<CombinedStockDat
 
                 // Mapping TradeInfo fields
                 dto.setTradeId(rs.getString("trade_id"));
-                dto.setInstrumentId(rs.getString("t_instrumentId"));
+                dto.setInstrumentId(rs.getString("s_symbol"));
                 dto.setTradedVolumeLakhs(rs.getBigDecimal("traded_volume_lakhs"));
                 dto.setTradedValueCr(rs.getBigDecimal("traded_value_cr"));
                 dto.setTotalMarketCapCr(rs.getBigDecimal("total_market_cap_cr"));
