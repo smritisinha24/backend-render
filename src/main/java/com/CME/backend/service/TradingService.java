@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -41,6 +42,7 @@ public class TradingService {
     private AggregateRepository aggregateRepository;
 
 
+    //  Checking if the database source provided is either clickhouse or postgres only
     private void validateDbSource(String dbsource) {
         if (!"clickhouse".equalsIgnoreCase(dbsource) && !"postgres".equalsIgnoreCase(dbsource)) {
             throw new ResponseStatusException(
@@ -49,14 +51,15 @@ public class TradingService {
         }
     }
 
-    // Fetch all stocks data
+    // Fetch all stocks data from stock data table
     public List<StockData> getAllStockData(String dbsource) {
         validateDbSource(dbsource);
 
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
             return clickhouseRepository.findAllStockData();
+        } else {
+            return stockDataRepository.findAll();
         }
-        return stockDataRepository.findAll();
     }
 
     // Fetch specific stock data using symbol
@@ -65,29 +68,30 @@ public class TradingService {
 
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
             return clickhouseRepository.findStockDataBySymbol(symbol);
+        } else {
+            return stockDataRepository.findStockDataBySymbol(symbol);
         }
-        return stockDataRepository.findBySymbolIgnoreCase(symbol);
     }
 
-    // Fetch specific trade info using symbol
-    public List<TradeInfo> getTradeInfoBySymbol(String symbol, String dbsource) {
+    // Fetch specific trade info using Instrument ID
+    public List<TradeInfo> getTradeInfoByInstrumentId(String instrumentid, String dbsource) {
         validateDbSource(dbsource);
 
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
-            return clickhouseRepository.findTradeInfoBySymbol(symbol);
+            return clickhouseRepository.findTradeInfoByInstrumentId(instrumentid);
         } else {
-            return tradeInfoRepository.findTradeInfo(symbol);
+            return tradeInfoRepository.findTradeInfoByInstrumentId(instrumentid);
         }
     }
 
-    // Fetch specific instrument info using symbol
+    // Fetch specific instrument info using Instrument ID
     public Instrument getInstrumentById(String instrumentId, String dbsource) {
         validateDbSource(dbsource);
 
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
-            return clickhouseRepository.findInstrumentByInstrumentId(instrumentId);
+            return clickhouseRepository.findInstrumentInfoByInstrumentId(instrumentId);
         } else {
-            return instrumentRepository.findByInstrumentIdIgnoreCase(instrumentId);
+            return instrumentRepository.findInstrumentInfoByInstrumentId(instrumentId);
         }
     }
 
@@ -98,28 +102,29 @@ public class TradingService {
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
             return clickhouseRepository.findCombinedDataBySymbol(symbol);
         } else {
-            return combinedDataRepository.getCombinedDataBySymbol(symbol);
+            return combinedDataRepository.findCombinedDataBySymbol(symbol);
         }
     }
 
+    //    Fetch trade specific aggregated statistics from trade_info table using startDate and endDate
     public List<TradeAggregateDTO> getTradeStats(String dbsource, LocalDate startDate, LocalDate endDate) {
+        validateDbSource(dbsource);
+
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
             return clickhouseRepository.getTradeAggregateStats(startDate, endDate);
-        } else if ("postgres".equalsIgnoreCase(dbsource)) {
-            return aggregateRepository.getTradeAggregateStats(startDate, endDate);
         } else {
-            throw new IllegalArgumentException("Invalid dbsource. Use 'clickhouse' or 'postgres'.");
+            return aggregateRepository.getTradeAggregateStats(startDate, endDate);
         }
     }
 
+    //    Fetch industry specific aggregated statistics from trade_info table using startDate and endDate
     public List<IndustryAggregateDTO> getIndustryStats(String dbsource, LocalDate startDate, LocalDate endDate) {
+        validateDbSource(dbsource);
+
         if ("clickhouse".equalsIgnoreCase(dbsource)) {
             return clickhouseRepository.getIndustryAggregateStats(startDate, endDate);
-        } else if ("postgres".equalsIgnoreCase(dbsource)) {
-            return aggregateRepository.getIndustryAggregateStats(startDate, endDate);
         } else {
-            throw new IllegalArgumentException("Invalid dbsource. Use 'clickhouse' or 'postgres'.");
+            return aggregateRepository.getIndustryAggregateStats(startDate, endDate);
         }
-
     }
 }

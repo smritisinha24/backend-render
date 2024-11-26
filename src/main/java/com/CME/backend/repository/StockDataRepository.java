@@ -6,5 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StockDataRepository extends JpaRepository<StockData, String> {
-    StockData findBySymbolIgnoreCase(String symbol);
+    // Fetch stock data for a specific symbol from stock_data table.
+    StockData findStockDataBySymbol(String symbol);
 }

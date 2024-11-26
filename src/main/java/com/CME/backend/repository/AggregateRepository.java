@@ -17,6 +17,7 @@ public class AggregateRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    //    Fetch trade specific aggregated statistics from trade_info table using startDate and endDate
     public List<TradeAggregateDTO> getTradeAggregateStats(LocalDate startDate, LocalDate endDate) {
         String query = """
             SELECT
@@ -45,7 +46,8 @@ public class AggregateRepository {
         ));
     }
 
-    // New method for industry-based aggregate stats
+
+    //    Fetch industry specific aggregated statistics from trade_info table using startDate and endDate
     public List<IndustryAggregateDTO> getIndustryAggregateStats(LocalDate startDate, LocalDate endDate) {
         String query = """
         SELECT

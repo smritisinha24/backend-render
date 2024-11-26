@@ -2,6 +2,8 @@ package com.CME.backend.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PerformanceMetrics {
     private long startTime;
@@ -9,10 +11,16 @@ public class PerformanceMetrics {
     private int queryCount;
     private long totalBytesProcessed;
 
+    // New variables to store row-level metrics
+    private List<Long> rowProcessingTimes = new ArrayList<>();
+    private List<Long> rowDataSizes = new ArrayList<>();
+
     public void startSession() {
         this.startTime = System.nanoTime();
         this.queryCount = 0;
         this.totalBytesProcessed = 0;
+        this.rowProcessingTimes.clear();
+        this.rowDataSizes.clear();
     }
 
     public void endQuery(long dataSizeInBytes) {
@@ -50,5 +58,7 @@ public class PerformanceMetrics {
         this.endTime = 0;
         this.queryCount = 0;
         this.totalBytesProcessed = 0;
+        this.rowProcessingTimes.clear();
+        this.rowDataSizes.clear();
     }
 }

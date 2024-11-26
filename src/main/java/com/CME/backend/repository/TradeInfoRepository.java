@@ -9,6 +9,7 @@ import java.util.List;
 
 @Repository
 public interface TradeInfoRepository extends JpaRepository<TradeInfo, String> {
+    // Fetch trade information for a specific instrument ID from trade_info table.
     @Query(value = "SELECT * FROM trade_info WHERE instrument_id = :instrumentId", nativeQuery = true)
-    List<TradeInfo> findTradeInfo(String instrumentId);
+    List<TradeInfo> findTradeInfoByInstrumentId(String instrumentId);
 }

@@ -16,7 +16,8 @@ public class CombinedDataRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<CombinedStockDataDTO> getCombinedDataBySymbol(String symbol) {
+    //   fetch combined data from all three tables(Stock_data, trade_info and instruments) by joining tables using symbol and instrument id
+    public List<CombinedStockDataDTO> findCombinedDataBySymbol(String symbol) {
         String query = """           
             SELECT 
                 s.symbol AS s_symbol, s.prev_close, s.iep, s.chng, s.pct_chng, s.final_value, s.final_quantity, 
